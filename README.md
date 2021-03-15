@@ -34,7 +34,7 @@ output "compartment_name" {
 # Example: Multiple compartments
 ```hcl
 module "compartment-envs" {
-  for_each = toset(["dev,", "test", "QA", "prod"])
+  for_each = toset(["env1", "env2", "env3"])
   source = "Terraform-Modules-Lib/compartment/oci"
   version = "~> 0"
   
@@ -46,10 +46,16 @@ module "compartment-envs" {
   parent_ocid = "ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }
 
+locals {
+  # Create an array of oci_identity_compartment
+  compartments = [ for compartment in module.compartment-envs:
+    compartment.oci-compartment
+  ]
+}
+
 output "compartment-envs" {
-  value = { for env, compartment in module.compartment-envs:
-    env => compartment.oci-compartment.id
+  value = { for compartment in local.compartments:
+    compartment.name => compartment.id
   }
 }
 ```
-
