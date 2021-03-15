@@ -5,9 +5,9 @@ This Terraform module allows an Oracle Cloud Infrastructure compartment to be us
 
 This argument control also enable_delete value.
 
-# Example
+# Example: Basic usage
 ```hcl
-module "oci-compartment" {
+module "my-compartment" {
   source = "Terraform-Modules-Lib/compartment/oci"
   
   # Pinning a specific version
@@ -27,7 +27,29 @@ module "oci-compartment" {
 }
 
 output "compartment_name" {
-  value = module.oci-compartment.compartment.name
+  value = module.my-compartment.oci-compartment.name
+}
+```
+
+# Example: Multiple compartments
+```hcl
+module "compartment-envs" {
+  for_each = toset(["dev,", "test", "QA", "prod"])
+  source = "Terraform-Modules-Lib/compartment/oci"
+  version = "~> 0"
+  
+  providers = {
+    oci = oci.home
+  }
+
+  name = each.value
+  parent_ocid = "ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+
+output "compartment-envs" {
+  value = { for env, compartment in module.compartment-envs:
+    env => compartment.oci-compartment.id
+  }
 }
 ```
 
