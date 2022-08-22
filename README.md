@@ -22,12 +22,23 @@ module "my-compartment" {
   name = "my-compartment"
   # ... and its parent (can be tenancy ocid)
   parent_ocid = "ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  
+  # Provide tenancy ocid to create admin group and related policy
+  tenanct_ocid = "ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
   manage = true
 }
 
 output "compartment_name" {
   value = module.my-compartment.oci-compartment.name
+}
+
+output "admins_name" {
+  value = module.my-compartment.oci-group-admins.name
+}
+
+output "policy_name" {
+  value = module.my-compartment.oci-policy-admins.name
 }
 ```
 
@@ -44,6 +55,7 @@ module "compartment-envs" {
 
   name = each.value
   parent_ocid = "ocid1.compartment.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  tenanct_ocid = "ocid1.tenancy.oc1..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }
 
 locals {
