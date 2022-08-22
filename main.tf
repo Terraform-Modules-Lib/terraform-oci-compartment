@@ -47,3 +47,33 @@ resource "oci_identity_compartment" "this" {
 
   enable_delete = var.manage
 }
+
+resource "oci_identity_group" "admins" {
+  for_each = {
+    for compartment in oci_identity_compartment.this :
+        compartment.id => compartment
+  }
+
+  compartment_id = var.tenancy_ocid
+
+  name = "${each.value.name}-admins"
+  description = "Compartment ${each.value.name}'s administrators."
+}
+  
+resource "oci_identity_policy" "compartment_admins" {
+  for_each = {
+    for group in oci_identity_group.admins :
+        group.id => group
+  }
+  
+  compartment_id = var.tenancy_ocid
+  
+  name = each.value.name
+  description = "Grants for compartment ${oci_identity_compartment.this[0].name}'s adminstrators group (${each.value.name})."
+    statements = [
+      "Allow group ${each.value.name} to use users in tenancy",
+      "Allow group ${each.value.name} to manage groups in tenancy where target.group.name = '${each.value.name}'",
+      "Allow group ${each.value.name} to manage policies in compartment ${oci_identity_compartment.this[0].name}",
+      "Allow group ${each.value.name} to manage all-resources in compartment ${oci_identity_compartment.this[0].name}",
+    ]
+}
