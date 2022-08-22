@@ -49,31 +49,25 @@ resource "oci_identity_compartment" "this" {
 }
 
 resource "oci_identity_group" "admins" {
-  for_each = {
-    for compartment in oci_identity_compartment.this :
-        compartment.id => compartment
-  }
+  count = var.manage ? 1 : 0
 
   compartment_id = var.tenancy_ocid
 
-  name = "${each.value.name}-admins"
-  description = "Compartment ${each.value.name}'s administrators."
+  name = "${local.this.name}-admins"
+  description = "Compartment ${local.this.name}'s administrators."
 }
   
 resource "oci_identity_policy" "compartment_admins" {
-  for_each = {
-    for group in oci_identity_group.admins :
-        group.id => group
-  }
+  count = var.manage ? 1 : 0
   
   compartment_id = var.tenancy_ocid
   
-  name = each.value.name
-  description = "Grants for compartment ${oci_identity_compartment.this[0].name}'s adminstrators group (${each.value.name})."
+  name = local.this.name
+  description = "Grants for compartment ${local.this.name}'s adminstrators group (${oci_identity_group.admins[0].name})."
     statements = [
-      "Allow group ${each.value.name} to use users in tenancy",
-      "Allow group ${each.value.name} to manage groups in tenancy where target.group.name = '${each.value.name}'",
-      "Allow group ${each.value.name} to manage policies in compartment ${oci_identity_compartment.this[0].name}",
-      "Allow group ${each.value.name} to manage all-resources in compartment ${oci_identity_compartment.this[0].name}",
+      "Allow group ${oci_identity_group.admins[0].name} to use users in tenancy",
+      "Allow group ${oci_identity_group.admins[0].name} to manage groups in tenancy where target.group.name = '${oci_identity_group.admins[0].name}'",
+      "Allow group ${oci_identity_group.admins[0].name} to manage policies in compartment ${local.this.name}",
+      "Allow group ${oci_identity_group.admins[0].name} to manage all-resources in compartment ${local.this.name}",
     ]
 }
