@@ -11,9 +11,19 @@ terraform {
 }
 
 locals {
-  this = try(
-    oci_identity_compartment.this[0],
-    data.oci_identity_compartments.this.compartments[0],
+  compartment = try(
+    oci_identity_compartment.compartment[0],
+    data.oci_identity_compartments.compartments.compartments[0],
+    ""
+  )
+  
+  group_admins = try(
+    oci_identity_group.group_admins[0],
+    ""
+  )
+  
+  policy_admins = try(
+    oci_identity_policy.policy_admins[0],
     ""
   )
 
@@ -27,7 +37,7 @@ data "oci_identity_compartment" "parent" {
   id = var.parent_ocid
 }
 
-data "oci_identity_compartments" "this" {
+data "oci_identity_compartments" "compartments" {
   compartment_id = local.parent.id
   name = var.name
 
@@ -35,7 +45,7 @@ data "oci_identity_compartments" "this" {
   compartment_id_in_subtree = false
 }
 
-resource "oci_identity_compartment" "this" {
+resource "oci_identity_compartment" "compartment" {
   count = var.manage ? 1 : 0
 
   compartment_id = local.parent.id
@@ -48,26 +58,26 @@ resource "oci_identity_compartment" "this" {
   enable_delete = var.manage
 }
 
-resource "oci_identity_group" "admins" {
+resource "oci_identity_group" "group_admins" {
   count = var.manage ? 1 : 0
 
   compartment_id = var.tenancy_ocid
 
-  name = "${local.this.name}-admins"
-  description = "Compartment ${local.this.name}'s administrators."
+  name = "${local.compartment.name}-admins"
+  description = "Compartment ${local.compartment.name}'s administrators."
 }
   
-resource "oci_identity_policy" "compartment_admins" {
+resource "oci_identity_policy" "policy_admins" {
   count = var.manage ? 1 : 0
   
   compartment_id = var.tenancy_ocid
   
-  name = local.this.name
-  description = "Grants for compartment ${local.this.name}'s adminstrators group (${oci_identity_group.admins[0].name})."
+  name = local.compartment.name
+  description = "Grants for compartment ${local.compartment.name}'s adminstrators group (${local.group_admins.name})."
     statements = [
-      "Allow group ${oci_identity_group.admins[0].name} to use users in tenancy",
-      "Allow group ${oci_identity_group.admins[0].name} to manage groups in tenancy where target.group.name = '${oci_identity_group.admins[0].name}'",
-      "Allow group ${oci_identity_group.admins[0].name} to manage policies in compartment ${local.this.name}",
-      "Allow group ${oci_identity_group.admins[0].name} to manage all-resources in compartment ${local.this.name}",
+      "Allow group ${local.group_admins.name} to use users in tenancy",
+      "Allow group ${local.group_admins.name} to manage groups in tenancy where target.group.name = '${local.group_admins.name}'",
+      "Allow group ${local.group_admins.name} to manage policies in compartment ${local.compartment.name}",
+      "Allow group ${local.group_admins.name} to manage all-resources in compartment ${local.compartment.name}",
     ]
 }
