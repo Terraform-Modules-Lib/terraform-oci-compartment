@@ -1,5 +1,5 @@
 output "oci-compartment" {
-    value = local.this
+    value = local.compartment
     description = "Return an oci_identity_compartment resource or an empty string."
 }
 
