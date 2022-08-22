@@ -1,3 +1,15 @@
+variable "tenancy_ocid" {
+    type = string
+    description = "(Required) (Updatable) The OCID of the tenancy (root compartment) containing the compartment."
+
+    validation {
+      condition = contains(["ocid1.tenancy.oc1"],
+        split("..", var.parent_ocid)[0]
+      )
+      error_message = "The tenancy_ocid value must be a valid tenancy OCID."
+    }
+}
+
 variable "parent_ocid" {
     type = string
     description = "(Required) (Updatable) The OCID of the parent compartment containing the compartment."
