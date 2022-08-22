@@ -4,7 +4,7 @@ variable "tenancy_ocid" {
 
     validation {
       condition = contains(["ocid1.tenancy.oc1"],
-        split("..", var.parent_ocid)[0]
+        split("..", var.tenancy_ocid)[0]
       )
       error_message = "The tenancy_ocid value must be a valid tenancy OCID."
     }
