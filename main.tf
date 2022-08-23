@@ -65,6 +65,9 @@ resource "oci_identity_group" "group_admins" {
 
   name = "${local.compartment.name}-admins"
   description = "Compartment ${local.compartment.name}'s administrators."
+  
+  defined_tags = local.defined_tags
+  freeform_tags = merge({manages = ${local.compartment.name}}, local.freeform_tags)
 }
   
 resource "oci_identity_policy" "policy_admin" {
@@ -74,10 +77,14 @@ resource "oci_identity_policy" "policy_admin" {
   
   name = local.compartment.name
   description = "Permissions for compartment ${local.compartment.name}'s administrators group (${local.group_admins.name})."
-    statements = [
+  
+  statements = [
       "Allow group ${local.group_admins.name} to use users in tenancy",
       "Allow group ${local.group_admins.name} to manage groups in tenancy where target.group.name = '${local.group_admins.name}'",
       "Allow group ${local.group_admins.name} to manage policies in compartment id ${local.compartment.id}",
       "Allow group ${local.group_admins.name} to manage all-resources in compartment id ${local.compartment.id}",
     ]
+  
+  defined_tags = local.defined_tags
+  freeform_tags = local.freeform_tags
 }
