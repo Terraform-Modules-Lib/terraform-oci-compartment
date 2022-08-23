@@ -9,6 +9,6 @@ output "oci_group_admins" {
 }
 
 output "oci_policy_admin" {
-    value = local.policy_admins
+    value = local.policy_admin
     description = "Return an oci_identity_policy resource or an empty string."
 }
