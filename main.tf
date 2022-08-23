@@ -77,7 +77,7 @@ resource "oci_identity_policy" "policy_admins" {
     statements = [
       "Allow group ${local.group_admins.name} to use users in tenancy",
       "Allow group ${local.group_admins.name} to manage groups in tenancy where target.group.name = '${local.group_admins.name}'",
-      "Allow group ${local.group_admins.name} to manage policies in compartment ${local.compartment.name}",
-      "Allow group ${local.group_admins.name} to manage all-resources in compartment ${local.compartment.name}",
+      "Allow group ${local.group_admins.name} to manage policies in compartment id ${local.compartment.id}",
+      "Allow group ${local.group_admins.name} to manage all-resources in compartment id ${local.compartment.id}",
     ]
 }
