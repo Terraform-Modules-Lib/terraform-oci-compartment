@@ -22,8 +22,8 @@ locals {
     ""
   )
   
-  policy_admins = try(
-    oci_identity_policy.policy_admins[0],
+  policy_admin = try(
+    oci_identity_policy.policy_admin[0],
     ""
   )
 
@@ -67,7 +67,7 @@ resource "oci_identity_group" "group_admins" {
   description = "Compartment ${local.compartment.name}'s administrators."
 }
   
-resource "oci_identity_policy" "policy_admins" {
+resource "oci_identity_policy" "policy_admin" {
   count = var.manage ? 1 : 0
   
   compartment_id = var.tenancy_ocid
