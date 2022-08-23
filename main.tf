@@ -68,7 +68,7 @@ resource "oci_identity_group" "group_admins" {
   
   defined_tags = local.defined_tags
   freeform_tags = merge({
-    manages = ${local.compartment.name},
+    manages = "${local.compartment.name}",
     }, local.freeform_tags
   )
 }
