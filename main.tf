@@ -67,7 +67,10 @@ resource "oci_identity_group" "group_admins" {
   description = "Compartment ${local.compartment.name}'s administrators."
   
   defined_tags = local.defined_tags
-  freeform_tags = merge({manages = ${local.compartment.name}}, local.freeform_tags)
+  freeform_tags = merge({
+    manages = ${local.compartment.name},
+    }, local.freeform_tags
+  )
 }
   
 resource "oci_identity_policy" "policy_admin" {
