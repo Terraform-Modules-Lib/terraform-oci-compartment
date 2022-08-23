@@ -73,7 +73,7 @@ resource "oci_identity_policy" "policy_admin" {
   compartment_id = var.tenancy_ocid
   
   name = local.compartment.name
-  description = "Grants for compartment ${local.compartment.name}'s adminstrators group (${local.group_admins.name})."
+  description = "Permitions for compartment ${local.compartment.name}'s administrators group (${local.group_admins.name})."
     statements = [
       "Allow group ${local.group_admins.name} to use users in tenancy",
       "Allow group ${local.group_admins.name} to manage groups in tenancy where target.group.name = '${local.group_admins.name}'",
